@@ -150,7 +150,6 @@ function draw() {
   if (player) player.update();
   if (player) player.draw();
 
-  // Bullets
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     b.update();
@@ -158,7 +157,6 @@ function draw() {
     if (b.y < -30) bullets.splice(i, 1);
   }
 
-  // Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     e.update();
@@ -188,7 +186,6 @@ function draw() {
     if (e.y > canvas.height) enemies.splice(i, 1);
   }
 
-  // Power-ups
   for (let i = powerUps.length - 1; i >= 0; i--) {
     const p = powerUps[i];
     p.update();
@@ -203,7 +200,6 @@ function draw() {
     if (p.y > canvas.height) powerUps.splice(i, 1);
   }
 
-  // Partículas
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.update();
@@ -236,7 +232,6 @@ function shoot() {
   if (!gameRunning || !player) return;
   const center = player.x + player.width / 2 - 3;
   bullets.push(new Bullet(center, player.y - 5));
-
   if (doubleShot) {
     bullets.push(new Bullet(center - 12, player.y));
     bullets.push(new Bullet(center + 12, player.y));
@@ -262,10 +257,10 @@ document.addEventListener('keydown', e => {
 // ===================== MENU =====================
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("Como Jogar:\n\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes para tiro duplo!");
+  alert("Como Jogar:\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes!");
 });
 document.getElementById('highscoreBtn').addEventListener('click', () => {
-  alert(`🏆 Recorde Atual: ${highscore} pontos`);
+  alert(`🏆 Recorde: ${highscore} pontos`);
 });
 
 function startGame() {
@@ -294,7 +289,7 @@ function endGame() {
     localStorage.setItem('shooterHighscore', highscore);
     highscoreEl.textContent = highscore;
   }
-  alert(`💥 GAME OVER!\n\nWave: ${wave}\nPontuação: ${score}`);
+  alert(`💥 GAME OVER!\nWave: ${wave}\nPontos: ${score}`);
   menu.style.display = 'flex';
   gameInfo.style.display = 'none';
 }
