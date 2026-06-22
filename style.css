@@ -1,1 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Arial Black', Arial, sans-serif;
+  background: linear-gradient(#000022, #000011);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+header {
+  padding: 20px;
+  background: linear-gradient(#220044, #5500aa);
+  font-size: 2.5em;
+  text-shadow: 0 0 25px #aa00ff;
+}
+
+/* Info do jogo */
+.info {
+  display: flex;
+  justify-content: space-around;
+  font-size: 24px;
+  padding: 12px;
+  background: rgba(0, 0, 80, 0.95);
+  border-bottom: 3px solid #00ffff;
+  flex-wrap: wrap;
+}
+
+/* Container do Canvas */
+#game-container {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  margin: 20px auto;
+  background: #000011;
+  border: 8px solid #00ffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 40px #00ffff;
+}
+
+canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* MENU */
+.menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 60, 0.98);
+  padding: 40px 70px;
+  border: 6px solid #00ffff;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 100;
+  box-shadow: 0 0 60px #00ffff;
+  min-width: 360px;
+}
+
+.menu h1 {
+  font-size: 2.8em;
+  margin-bottom: 15px;
+  color: #00ffff;
+  text-shadow: 0 0 20px #00ffff;
+}
+
+.menu p {
+  margin-bottom: 30px;
+  font-size: 1.3em;
+  color: #aaccff;
+}
+
+.menu button {
+  width: 100%;
+  padding: 16px;
+  margin: 10px 0;
+  font-size: 22px;
+  background: linear-gradient(#ff0088, #cc0066);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.menu button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(#ff44aa, #ff0088);
+}
