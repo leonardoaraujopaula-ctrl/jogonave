@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 SPACE SHOOTER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🚀 SPACE SHOOTER</h1>
+  </header>
 
+  <!-- MENU -->
+  <div id="menu" class="menu">
+    <h1>🚀 SPACE SHOOTER</h1>
+    <p>Defenda a Terra dos invasores!</p>
+    <button id="startBtn">▶ INICIAR JOGO</button>
+    <button id="howToPlayBtn">❔ COMO JOGAR</button>
+    <button id="highscoreBtn">🏆 RECORDES</button>
+  </div>
+
+  <!-- INFO DURANTE O JOGO -->
+  <div class="info" id="gameInfo" style="display: none;">
+    <div>Pontos: <span id="score">0</span></div>
+    <div>Wave: <span id="wave">1</span></div>
+    <div>Vidas: <span id="lives">3</span></div>
+    <div>Recorde: <span id="highscore">0</span></div>
+  </div>
+
+  <!-- JOGO -->
+  <div id="game-container">
+    <canvas id="game" width="800" height="500"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
