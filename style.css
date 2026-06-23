@@ -30,7 +30,7 @@ header {
   flex-wrap: wrap;
 }
 
-/* Container do Canvas */
+/* Container do jogo */
 #game-container {
   position: relative;
   width: 800px;
@@ -43,54 +43,66 @@ header {
   box-shadow: 0 0 40px #00ffff;
 }
 
-canvas {
-  display: block;
-  image-rendering: pixelated;
-}
+canvas { display: block; }
 
-/* MENU */
+/* ===================== MENU MELHORADO ===================== */
 .menu {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(10, 10, 60, 0.98);
-  padding: 40px 70px;
-  border: 6px solid #00ffff;
-  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(15, 15, 70, 0.98), rgba(5, 5, 35, 0.98));
+  padding: 45px 75px;
+  border: 7px solid #00ffff;
+  border-radius: 25px;
   text-align: center;
   z-index: 100;
-  box-shadow: 0 0 60px #00ffff;
-  min-width: 360px;
+  box-shadow: 0 0 80px #00ffff, inset 0 0 50px rgba(0, 255, 255, 0.2);
+  min-width: 380px;
+  animation: menuPop 0.6s ease;
 }
 
-.menu h1 {
-  font-size: 2.8em;
-  margin-bottom: 15px;
-  color: #00ffff;
-  text-shadow: 0 0 20px #00ffff;
+@keyframes menuPop {
+  from { transform: translate(-50%, -60%) scale(0.7); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-.menu p {
-  margin-bottom: 30px;
-  font-size: 1.3em;
+.menu-header h1 {
+  font-size: 3.1em;
+  margin-bottom: 8px;
+  background: linear-gradient(#00ffff, #44ddff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px #00ffff;
+}
+
+.menu-header p {
+  font-size: 1.4em;
   color: #aaccff;
+  margin-bottom: 35px;
 }
 
 .menu button {
   width: 100%;
-  padding: 16px;
-  margin: 10px 0;
-  font-size: 22px;
+  padding: 18px 25px;
+  margin: 12px 0;
+  font-size: 23px;
+  font-weight: bold;
   background: linear-gradient(#ff0088, #cc0066);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 0, 120, 0.5);
 }
 
 .menu button:hover {
-  transform: scale(1.05);
+  transform: scale(1.08) translateY(-4px);
   background: linear-gradient(#ff44aa, #ff0088);
+  box-shadow: 0 0 35px #ff00ff;
+}
+
+.menu button:active {
+  transform: scale(0.96);
 }
