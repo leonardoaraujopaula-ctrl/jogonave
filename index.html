@@ -11,16 +11,20 @@
     <h1>🚀 SPACE SHOOTER</h1>
   </header>
 
-  <!-- MENU -->
+  <!-- MENU MELHORADO -->
   <div id="menu" class="menu">
-    <h1>🚀 SPACE SHOOTER</h1>
-    <p>Defenda a Terra dos invasores!</p>
+    <div class="menu-header">
+      <h1>🚀 SPACE SHOOTER</h1>
+      <p>Defenda a Terra dos invasores!</p>
+    </div>
+    
     <button id="startBtn">▶ INICIAR JOGO</button>
     <button id="howToPlayBtn">❔ COMO JOGAR</button>
     <button id="highscoreBtn">🏆 RECORDES</button>
+    <button id="creditsBtn">ℹ️ CRÉDITOS</button>
   </div>
 
-  <!-- INFO DURANTE O JOGO -->
+  <!-- INFO DO JOGO -->
   <div class="info" id="gameInfo" style="display: none;">
     <div>Pontos: <span id="score">0</span></div>
     <div>Wave: <span id="wave">1</span></div>
@@ -28,7 +32,6 @@
     <div>Recorde: <span id="highscore">0</span></div>
   </div>
 
-  <!-- JOGO -->
   <div id="game-container">
     <canvas id="game" width="800" height="500"></canvas>
   </div>
