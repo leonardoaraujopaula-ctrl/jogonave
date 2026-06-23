@@ -257,10 +257,13 @@ document.addEventListener('keydown', e => {
 // ===================== MENU =====================
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("Como Jogar:\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes!");
+  alert("Como Jogar:\n\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes para tiro duplo!");
 });
 document.getElementById('highscoreBtn').addEventListener('click', () => {
-  alert(`🏆 Recorde: ${highscore} pontos`);
+  alert(`🏆 Recorde Atual: ${highscore} pontos`);
+});
+document.getElementById('creditsBtn').addEventListener('click', () => {
+  alert("🎮 SPACE SHOOTER\n\nDesenvolvido com HTML, CSS e JavaScript\nFeito com ajuda do Grok (xAI)\n\nObrigado por jogar!");
 });
 
 function startGame() {
@@ -289,7 +292,7 @@ function endGame() {
     localStorage.setItem('shooterHighscore', highscore);
     highscoreEl.textContent = highscore;
   }
-  alert(`💥 GAME OVER!\nWave: ${wave}\nPontos: ${score}`);
+  alert(`💥 GAME OVER!\n\nWave: ${wave}\nPontuação: ${score}`);
   menu.style.display = 'flex';
   gameInfo.style.display = 'none';
 }
