@@ -3,17 +3,16 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const waveEl = document.getElementById('wave');
 const livesEl = document.getElementById('lives');
-const highscoreEl = document.getElementById('highscore');
 const menu = document.getElementById('menu');
 const gameInfo = document.getElementById('gameInfo');
 
-let score = 0, lives = 3, wave = 1, gameRunning = false, paused = false;
+let score = 0, lives = 3, phase = 1, gameRunning = false, paused = false;
 let player, bullets = [], enemies = [], particles = [], stars = [], powerUps = [];
 let keys = {};
-let highscore = localStorage.getItem('shooterHighscore') || 0;
-highscoreEl.textContent = highscore;
+let playerName = "";
 let doubleShot = false;
 let doubleShotTime = 0;
+let highscores = JSON.parse(localStorage.getItem('spaceHighscores')) || [];
 
 // ===================== CLASSES =====================
 class Player {
@@ -31,10 +30,8 @@ class Player {
     ctx.lineTo(this.x + this.width, this.y + this.height);
     ctx.closePath();
     ctx.fill();
-
     ctx.fillStyle = '#00ffcc';
     ctx.fillRect(this.x + 18, this.y + 12, this.width - 36, 22);
-
     ctx.fillStyle = '#0088ff';
     ctx.fillRect(this.x + 5, this.y + 30, 14, 18);
     ctx.fillRect(this.x + this.width - 19, this.y + 30, 14, 18);
@@ -44,7 +41,6 @@ class Player {
     if (keys['ArrowRight'] || keys['d'] || keys['D']) this.x += this.speed;
     if (keys['ArrowUp'] || keys['w'] || keys['W']) this.y -= this.speed;
     if (keys['ArrowDown'] || keys['s'] || keys['S']) this.y += this.speed;
-
     this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
     this.y = Math.max(50, Math.min(canvas.height - this.height - 20, this.y));
   }
@@ -71,7 +67,7 @@ class Enemy {
     this.width = 50; this.height = 40;
     this.x = Math.random() * (canvas.width - this.width);
     this.y = -50;
-    this.speed = 2.3 + wave * 0.3;
+    this.speed = 2.3 + phase * 0.35;
   }
   update() { this.y += this.speed; }
   draw() {
@@ -145,6 +141,13 @@ function createExplosion(x, y) {
   }
 }
 
+function saveHighscore() {
+  highscores.push({ name: playerName, score: score, phase: phase });
+  highscores.sort((a, b) => b.score - a.score);
+  highscores = highscores.slice(0, 10);
+  localStorage.setItem('spaceHighscores', JSON.stringify(highscores));
+}
+
 function draw() {
   drawBackground();
   if (player) player.update();
@@ -174,7 +177,7 @@ function draw() {
     for (let j = bullets.length - 1; j >= 0; j--) {
       const b = bullets[j];
       if (b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) {
-        score += 20 + wave * 5;
+        score += 20 + phase * 5;
         scoreEl.textContent = score;
         createExplosion(e.x + e.width/2, e.y + e.height/2);
         enemies.splice(i, 1);
@@ -214,9 +217,9 @@ function gameLoop() {
   if (!gameRunning || paused) return;
   draw();
 
-  if (score > wave * 250) {
-    wave++;
-    waveEl.textContent = wave;
+  if (score > phase * 300) {
+    phase++;
+    waveEl.textContent = phase;
   }
 
   requestAnimationFrame(gameLoop);
@@ -225,7 +228,7 @@ function gameLoop() {
 function spawnEnemy() {
   if (!gameRunning || paused) return;
   enemies.push(new Enemy());
-  setTimeout(spawnEnemy, Math.max(280, 950 - wave * 55));
+  setTimeout(spawnEnemy, Math.max(250, 950 - phase * 55));
 }
 
 function shoot() {
@@ -243,7 +246,6 @@ window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if ((e.key === 'p' || e.key === 'P') && gameRunning) paused = !paused;
 });
-
 window.addEventListener('keyup', e => keys[e.key] = false);
 
 canvas.addEventListener('click', shoot);
@@ -255,19 +257,30 @@ document.addEventListener('keydown', e => {
 });
 
 // ===================== MENU =====================
-document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('startBtn').addEventListener('click', () => {
+  playerName = prompt("Digite seu nome para salvar no ranking:", "Jogador") || "Jogador";
+  startGame();
+});
+
+document.getElementById('rankingBtn').addEventListener('click', () => {
+  let text = "🏆 TOP 10 RANKING\n\n";
+  highscores.forEach((entry, i) => {
+    text += `${i+1}. ${entry.name} — ${entry.score} pts (Fase ${entry.phase})\n`;
+  });
+  if (highscores.length === 0) text += "Ainda não há recordes!";
+  alert(text);
+});
+
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("Como Jogar:\n\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes para tiro duplo!");
+  alert("Como Jogar:\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes!");
 });
-document.getElementById('highscoreBtn').addEventListener('click', () => {
-  alert(`🏆 Recorde Atual: ${highscore} pontos`);
-});
+
 document.getElementById('creditsBtn').addEventListener('click', () => {
-  alert("🎮 SPACE SHOOTER\n\nDesenvolvido com HTML, CSS e JavaScript\nFeito com ajuda do Grok (xAI)\n\nObrigado por jogar!");
+  alert("🚀 SPACE SHOOTER\nFeito com HTML, CSS e JavaScript");
 });
 
 function startGame() {
-  score = 0; lives = 3; wave = 1; doubleShot = false;
+  score = 0; lives = 3; phase = 1; doubleShot = false;
   bullets = []; enemies = []; particles = []; powerUps = [];
   
   scoreEl.textContent = '0';
@@ -287,14 +300,15 @@ function startGame() {
 
 function endGame() {
   gameRunning = false;
-  if (score > highscore) {
-    highscore = score;
-    localStorage.setItem('shooterHighscore', highscore);
-    highscoreEl.textContent = highscore;
-  }
-  alert(`💥 GAME OVER!\n\nWave: ${wave}\nPontuação: ${score}`);
+  saveHighscore();
+  alert(`💥 GAME OVER!\n\nFase: ${phase}\nPontuação: ${score}\n\n${playerName}, seu recorde foi salvo!`);
   menu.style.display = 'flex';
   gameInfo.style.display = 'none';
 }
 
-highscoreEl.textContent = highscore;
+function saveHighscore() {
+  highscores.push({ name: playerName, score: score, phase: phase });
+  highscores.sort((a, b) => b.score - a.score);
+  highscores = highscores.slice(0, 10);
+  localStorage.setItem('spaceHighscores', JSON.stringify(highscores));
+}
