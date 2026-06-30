@@ -1,7 +1,3 @@
-// =============================================
-// SPACE SHOOTER - SCRIPT.JS (VERSÃO FINAL)
-// =============================================
-
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
@@ -18,48 +14,52 @@ let doubleShot = false;
 let doubleShotTime = 0;
 let highscores = JSON.parse(localStorage.getItem('spaceHighscores')) || [];
 
-// ===================== ÁUDIO =====================
+// ===================== SONS =====================
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function playShootSound() {
-  const osc = audioContext.createOscillator();
+  const oscillator = audioContext.createOscillator();
   const gain = audioContext.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.value = 900;
-  gain.gain.value = 0.25;
-  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
-  osc.connect(gain).connect(audioContext.destination);
-  osc.start();
-  osc.stop(audioContext.currentTime + 0.12);
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+  gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.15);
 }
 
 function playExplosionSound() {
   const noise = audioContext.createBufferSource();
-  const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.4, audioContext.sampleRate);
+  const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.5, audioContext.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
   noise.buffer = buffer;
   const filter = audioContext.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 700;
+  filter.frequency.value = 800;
   const gain = audioContext.createGain();
-  gain.gain.value = 0.7;
-  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
-  noise.connect(filter).connect(gain).connect(audioContext.destination);
+  gain.gain.setValueAtTime(0.6, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioContext.destination);
   noise.start();
 }
 
 function playPowerUpSound() {
-  const osc = audioContext.createOscillator();
+  const oscillator = audioContext.createOscillator();
   const gain = audioContext.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(700, audioContext.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(1400, audioContext.currentTime + 0.5);
-  gain.gain.value = 0.35;
-  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
-  osc.connect(gain).connect(audioContext.destination);
-  osc.start();
-  osc.stop(audioContext.currentTime + 0.6);
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.4);
+  gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.5);
 }
 
 // ===================== CLASSES =====================
@@ -115,7 +115,7 @@ class Enemy {
     this.width = 50; this.height = 40;
     this.x = Math.random() * (canvas.width - this.width);
     this.y = -50;
-    this.speed = 2.4 + phase * 0.3;
+    this.speed = 2.3 + phase * 0.35;
   }
   update() { this.y += this.speed; }
   draw() {
@@ -201,7 +201,6 @@ function draw() {
   if (player) player.update();
   if (player) player.draw();
 
-  // Bullets
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     b.update();
@@ -209,7 +208,6 @@ function draw() {
     if (b.y < -30) bullets.splice(i, 1);
   }
 
-  // Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     e.update();
@@ -241,7 +239,6 @@ function draw() {
     if (e.y > canvas.height) enemies.splice(i, 1);
   }
 
-  // Power-ups
   for (let i = powerUps.length - 1; i >= 0; i--) {
     const p = powerUps[i];
     p.update();
@@ -257,7 +254,6 @@ function draw() {
     if (p.y > canvas.height) powerUps.splice(i, 1);
   }
 
-  // Partículas
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.update();
@@ -314,7 +310,7 @@ document.addEventListener('keydown', e => {
 
 // ===================== MENU =====================
 document.getElementById('startBtn').addEventListener('click', () => {
-  playerName = prompt("Digite seu nome:", "Jogador") || "Jogador";
+  playerName = prompt("Digite seu nome para o ranking:", "Jogador") || "Jogador";
   startGame();
 });
 
@@ -323,16 +319,16 @@ document.getElementById('rankingBtn').addEventListener('click', () => {
   highscores.forEach((entry, i) => {
     text += `${i+1}. ${entry.name} — ${entry.score} pts (Fase ${entry.phase})\n`;
   });
-  if (highscores.length === 0) text += "Nenhum recorde ainda!";
+  if (highscores.length === 0) text += "Ainda não há recordes!";
   alert(text);
 });
 
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("Como Jogar:\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar");
+  alert("Como Jogar:\n↑ ↓ ← → ou WASD = Mover\nEspaço ou Clique = Atirar\nP = Pausar\n\nPegue os ×2 verdes!");
 });
 
 document.getElementById('creditsBtn').addEventListener('click', () => {
-  alert("SPACE SHOOTER\nFeito com ajuda do Grok");
+  alert("🚀 SPACE SHOOTER\nFeito com HTML, CSS e JavaScript");
 });
 
 function startGame() {
@@ -357,7 +353,7 @@ function startGame() {
 function endGame() {
   gameRunning = false;
   saveHighscore();
-  alert(`GAME OVER!\nFase: ${phase}\nPontos: ${score}\n\n${playerName}, seu recorde foi salvo!`);
+  alert(`💥 GAME OVER!\n\nFase: ${phase}\nPontuação: ${score}\n\n${playerName}, seu recorde foi salvo!`);
   menu.style.display = 'flex';
   gameInfo.style.display = 'none';
 }
