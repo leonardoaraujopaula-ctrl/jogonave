@@ -3,38 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚀 SPACE SHOOTER</title>
-  <link rel="stylesheet" href="style.css">
+  <title>🚀 SPACE SHOOTER - TESTE</title>
+  <style>
+    body { background: #000; color: white; font-family: Arial; text-align: center; padding: 50px; }
+    canvas { border: 3px solid cyan; background: #000; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>🚀 SPACE SHOOTER</h1>
-  </header>
+  <h1>TESTE - SPACE SHOOTER</h1>
+  <canvas id="game" width="800" height="500"></canvas>
+  <p>Clique na tela para atirar</p>
 
-  <!-- MENU -->
-  <div id="menu" class="menu">
-    <div class="menu-header">
-      <h1>🚀 SPACE SHOOTER</h1>
-      <p>Defenda a Terra dos invasores!</p>
-    </div>
-    
-    <button id="startBtn">▶ INICIAR JOGO</button>
-    <button id="rankingBtn">🏆 RANKING</button>
-    <button id="howToPlayBtn">❔ COMO JOGAR</button>
-    <button id="creditsBtn">ℹ️ CRÉDITOS</button>
-  </div>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
 
-  <!-- INFO DO JOGO -->
-  <div class="info" id="gameInfo" style="display: none;">
-    <div>Fase: <span id="wave">1</span></div>
-    <div>Pontos: <span id="score">0</span></div>
-    <div>Vidas: <span id="lives">3</span></div>
-  </div>
+    ctx.fillStyle = '#00ffff';
+    ctx.fillRect(370, 400, 60, 55);
 
-  <div id="game-container">
-    <canvas id="game" width="800" height="500"></canvas>
-  </div>
-
-  <script src="script.js"></script>
+    canvas.addEventListener('click', () => {
+      alert('Jogo carregou! Clique OK para continuar');
+    });
+  </script>
 </body>
 </html>
