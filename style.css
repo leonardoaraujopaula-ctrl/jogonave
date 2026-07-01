@@ -1,243 +1,101 @@
-/* =========================================================
-   SPACE SHOOTER - STYLE.CSS (VERSÃO FINAL LIMPA)
-========================================================= */
-
-/* ===========================
-   RESET
-=========================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html{
-    scroll-behavior:smooth;
+body {
+  font-family: 'Arial Black', Arial, sans-serif;
+  background: linear-gradient(#000022, #000011);
+  color: white;
+  text-align: center;
+  overflow: hidden;
 }
 
-body{
-    font-family:'Arial Black',Arial,sans-serif;
-    background:
-    radial-gradient(circle at top,#001144,#000011 70%);
-    color:#fff;
-    overflow:hidden;
-    text-align:center;
-    min-height:100vh;
-    position:relative;
+header {
+  padding: 20px;
+  background: linear-gradient(#220044, #5500aa);
+  font-size: 2.5em;
+  text-shadow: 0 0 25px #aa00ff;
 }
 
-/* ===========================
-   FUNDO ESPACIAL
-=========================== */
-
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background-image:
-    radial-gradient(white 1px,transparent 1px),
-    radial-gradient(cyan 1px,transparent 1px),
-    radial-gradient(#88ffff 2px,transparent 2px);
-
-    background-size:120px 120px,220px 220px,340px 340px;
-    animation:starsMove 70s linear infinite;
-    opacity:.45;
-    z-index:-2;
+/* Info do jogo */
+.info {
+  display: flex;
+  justify-content: space-around;
+  font-size: 24px;
+  padding: 12px;
+  background: rgba(0, 0, 80, 0.95);
+  border-bottom: 3px solid #00ffff;
+  flex-wrap: wrap;
 }
 
-body::after{
-    content:"";
-    position:fixed;
-    inset:-25%;
-    background:
-    radial-gradient(circle,#00ffff22,transparent 45%),
-    radial-gradient(circle,#aa00ff22,transparent 40%),
-    radial-gradient(circle,#0044ff22,transparent 35%);
-    filter:blur(70px);
-    animation:nebula 18s ease-in-out infinite alternate;
-    z-index:-3;
+/* Container do jogo */
+#game-container {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  margin: 20px auto;
+  background: #000011;
+  border: 8px solid #00ffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 40px #00ffff;
 }
 
-/* ===========================
-   ANIMAÇÕES DE FUNDO
-=========================== */
-
-@keyframes starsMove{
-    from{background-position:0 0,0 0,0 0;}
-    to{background-position:0 2000px,0 1400px,0 900px;}
+canvas {
+  display: block;
+  image-rendering: pixelated;
 }
 
-@keyframes nebula{
-    from{transform:translate(-5%,-5%) rotate(0deg);}
-    to{transform:translate(5%,5%) rotate(15deg);}
+/* MENU */
+.menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, rgba(15, 15, 70, 0.98), rgba(5, 5, 35, 0.98));
+  padding: 45px 75px;
+  border: 7px solid #00ffff;
+  border-radius: 25px;
+  text-align: center;
+  z-index: 100;
+  box-shadow: 0 0 80px #00ffff, inset 0 0 50px rgba(0, 255, 255, 0.2);
+  min-width: 380px;
 }
 
-/* ===========================
-   HEADER
-=========================== */
-
-header{
-    padding:22px;
-    background:linear-gradient(#220044,#5500aa);
-    border-bottom:3px solid cyan;
-    box-shadow:0 0 25px cyan;
+.menu-header h1 {
+  font-size: 3.1em;
+  margin-bottom: 8px;
+  background: linear-gradient(#00ffff, #44ddff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px #00ffff;
 }
 
-header h1{
-    font-size:2.7rem;
-    text-shadow:0 0 10px cyan,0 0 20px cyan,0 0 35px cyan;
-    animation:titleGlow 2s infinite alternate;
+.menu-header p {
+  font-size: 1.4em;
+  color: #aaccff;
+  margin-bottom: 35px;
 }
 
-@keyframes titleGlow{
-    from{text-shadow:0 0 10px cyan,0 0 20px cyan;}
-    to{text-shadow:0 0 20px cyan,0 0 40px cyan,0 0 70px cyan;}
+.menu button {
+  width: 100%;
+  padding: 18px 25px;
+  margin: 12px 0;
+  font-size: 23px;
+  font-weight: bold;
+  background: linear-gradient(#ff0088, #cc0066);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 0, 120, 0.5);
 }
 
-/* ===========================
-   INFO
-=========================== */
-
-.info{
-    display:flex;
-    justify-content:space-around;
-    flex-wrap:wrap;
-    padding:15px;
-    background:rgba(0,20,70,.92);
-    border-bottom:2px solid cyan;
-    box-shadow:0 0 20px cyan;
-    font-size:24px;
-}
-
-.info div{
-    padding:8px 20px;
-    background:rgba(255,255,255,.05);
-    border-radius:12px;
-}
-
-.info span{
-    color:#00ffff;
-    text-shadow:0 0 12px cyan;
-    animation:numberGlow 1.2s infinite alternate;
-}
-
-@keyframes numberGlow{
-    from{color:white;}
-    to{color:cyan;text-shadow:0 0 18px cyan,0 0 35px cyan;}
-}
-
-/* ===========================
-   GAME AREA
-=========================== */
-
-#game-container{
-    position:relative;
-    width:800px;
-    height:500px;
-    margin:25px auto;
-    overflow:hidden;
-    border-radius:18px;
-    border:6px solid #00ffff;
-    background:linear-gradient(to bottom,#000011,#000022,#000011);
-    box-shadow:0 0 40px cyan,inset 0 0 30px rgba(0,255,255,.15);
-    animation:borderGlow 2s infinite alternate;
-    transition:.3s;
-}
-
-#game-container:hover{
-    transform:scale(1.01);
-}
-
-@keyframes borderGlow{
-    from{box-shadow:0 0 20px cyan,0 0 40px cyan;}
-    to{box-shadow:0 0 35px cyan,0 0 70px cyan,0 0 110px cyan;}
-}
-
-/* ===========================
-   CANVAS
-=========================== */
-
-canvas{
-    width:100%;
-    height:100%;
-    display:block;
-    image-rendering:pixelated;
-    box-shadow:inset 0 0 25px rgba(0,255,255,.18);
-}
-
-/* ===========================
-   MENU
-=========================== */
-
-.menu{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:430px;
-    max-width:90%;
-    padding:45px;
-    border-radius:25px;
-    border:4px solid cyan;
-    background:linear-gradient(145deg,rgba(5,20,70,.96),rgba(0,0,30,.98));
-    box-shadow:0 0 60px cyan;
-    backdrop-filter:blur(12px);
-    animation:menuOpen .7s ease;
-    transition:.4s;
-}
-
-.menu:hover{
-    box-shadow:0 0 80px cyan, inset 0 0 50px rgba(0,255,255,.2);
-}
-
-@keyframes menuOpen{
-    from{opacity:0;transform:translate(-50%,-65%) scale(.75);}
-    to{opacity:1;transform:translate(-50%,-50%) scale(1);}
-}
-
-/* ===========================
-   BOTÕES
-=========================== */
-
-.menu button{
-    width:100%;
-    padding:18px;
-    margin:12px 0;
-    font-size:22px;
-    font-weight:bold;
-    color:white;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    background:linear-gradient(#ff0088,#bb0066);
-    box-shadow:0 0 15px #ff0088;
-    transition:.25s;
-}
-
-.menu button:hover{
-    transform:translateY(-5px) scale(1.05);
-    box-shadow:0 0 45px #ff00ff;
-}
-
-.menu button:active{
-    transform:scale(.95);
-}
-
-/* ===========================
-   RESPONSIVO
-=========================== */
-
-@media(max-width:900px){
-    #game-container{width:95vw;height:60vw;}
-    header h1{font-size:2rem;}
-    .menu{width:90%;padding:30px;}
-    .menu button{font-size:18px;}
-    .info{font-size:18px;}
-}
-
-@media(max-width:600px){
-    header h1{font-size:1.6rem;}
-    .menu-header h1{font-size:1.8rem;}
-    .info div{width:45%;font-size:16px;}
+.menu button:hover {
+  transform: scale(1.08) translateY(-4px);
+  background: linear-gradient(#ff44aa, #ff0088);
+  box-shadow: 0 0 35px #ff00ff;
 }
