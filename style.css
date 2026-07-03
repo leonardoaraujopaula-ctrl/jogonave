@@ -1,3 +1,5 @@
+/* ================= RESET ================= */
+
 * {
   margin: 0;
   padding: 0;
@@ -5,97 +7,221 @@
 }
 
 body {
-  font-family: 'Arial Black', Arial, sans-serif;
-  background: linear-gradient(#000022, #000011);
+  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at top, #0b0b2a, #000);
   color: white;
   text-align: center;
   overflow: hidden;
 }
 
+/* ================= HEADER ================= */
+
 header {
-  padding: 20px;
-  background: linear-gradient(#220044, #5500aa);
-  font-size: 2.5em;
-  text-shadow: 0 0 25px #aa00ff;
+  padding: 15px;
+  font-size: 2rem;
+  background: linear-gradient(90deg, #220044, #5500aa);
+  text-shadow: 0 0 15px #00ffff;
 }
 
-/* Info do jogo */
-.info {
-  display: flex;
-  justify-content: space-around;
-  font-size: 24px;
-  padding: 12px;
-  background: rgba(0, 0, 80, 0.95);
-  border-bottom: 3px solid #00ffff;
-  flex-wrap: wrap;
-}
+/* ================= MENU ================= */
 
-/* Container do jogo */
-#game-container {
-  position: relative;
-  width: 800px;
-  height: 500px;
-  margin: 20px auto;
-  background: #000011;
-  border: 8px solid #00ffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 0 40px #00ffff;
-}
-
-canvas {
-  display: block;
-  image-rendering: pixelated;
-}
-
-/* MENU */
 .menu {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(145deg, rgba(15, 15, 70, 0.98), rgba(5, 5, 35, 0.98));
-  padding: 45px 75px;
-  border: 7px solid #00ffff;
-  border-radius: 25px;
-  text-align: center;
-  z-index: 100;
-  box-shadow: 0 0 80px #00ffff, inset 0 0 50px rgba(0, 255, 255, 0.2);
-  min-width: 380px;
+  background: rgba(10, 10, 40, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 30px #00ffff;
+  width: 320px;
 }
 
-.menu-header h1 {
-  font-size: 3.1em;
-  margin-bottom: 8px;
-  background: linear-gradient(#00ffff, #44ddff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px #00ffff;
+.menu h1 {
+  margin-bottom: 10px;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
 }
 
-.menu-header p {
-  font-size: 1.4em;
-  color: #aaccff;
-  margin-bottom: 35px;
+.menu p {
+  margin-bottom: 20px;
+  color: #aaa;
 }
 
 .menu button {
   width: 100%;
-  padding: 18px 25px;
-  margin: 12px 0;
-  font-size: 23px;
-  font-weight: bold;
-  background: linear-gradient(#ff0088, #cc0066);
-  color: white;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(255, 0, 120, 0.5);
+  background: linear-gradient(45deg, #ff0066, #ff6600);
+  color: white;
+  transition: 0.2s;
 }
 
 .menu button:hover {
-  transform: scale(1.08) translateY(-4px);
-  background: linear-gradient(#ff44aa, #ff0088);
-  box-shadow: 0 0 35px #ff00ff;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #ff0066;
+}
+
+/* ================= GAME CONTAINER ================= */
+
+#game-container {
+  position: relative;
+  margin: 20px auto;
+  width: 800px;
+  height: 500px;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 25px #00ffff;
+  background: black;
+}
+
+canvas {
+  display: block;
+}
+
+/* ================= HUD ================= */
+
+.hud {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.hud .box {
+  background: rgba(0, 0, 50, 0.8);
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+/* ================= POWER UPS ================= */
+
+#powerContainer {
+  position: absolute;
+  top: 120px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#powerContainer .bar {
+  width: 120px;
+  height: 10px;
+  background: #222;
+  border: 1px solid #00ffff;
+}
+
+#shieldBar {
+  width: 0%;
+  height: 100%;
+  background: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+#doubleBar {
+  width: 0%;
+  height: 100%;
+  background: #ff00ff;
+  box-shadow: 0 0 10px #ff00ff;
+}
+
+/* ================= BOSS ================= */
+
+#bossContainer {
+  position: absolute;
+  top: 120px;
+  right: 10px;
+  text-align: right;
+  display: none;
+}
+
+.bossBar {
+  width: 160px;
+  height: 12px;
+  background: #222;
+  border: 1px solid red;
+}
+
+#bossLife {
+  width: 100%;
+  height: 100%;
+  background: red;
+  box-shadow: 0 0 10px red;
+}
+
+/* ================= GAME OVER ================= */
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 0, 40, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid red;
+  box-shadow: 0 0 30px red;
+  display: none;
+}
+
+.game-over h1 {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.game-over button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  background: red;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+.game-over button:hover {
+  box-shadow: 0 0 15px red;
+}
+
+/* ================= PAUSE ================= */
+
+.pause {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 30px;
+  color: yellow;
+  text-shadow: 0 0 10px yellow;
+  display: none;
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* ================= RESPONSIVO ================= */
+
+@media (max-width: 850px) {
+  #game-container {
+    width: 95%;
+    height: auto;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+  }
 }
