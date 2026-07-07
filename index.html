@@ -1,178 +1,40 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>🚀 SPACE SHOOTER DELUXE</title>
-
-    <link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 SPACE SHOOTER</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header>
+    <h1>🚀 SPACE SHOOTER</h1>
+  </header>
 
-<header>
-
-    <h1>🚀 SPACE SHOOTER DELUXE</h1>
-
-</header>
-
-<!-- ================= MENU ================= -->
-
-<div id="menu" class="menu">
-
-    <div class="menu-logo">
-
-        🚀
-
+  <!-- MENU -->
+  <div id="menu" class="menu">
+    <div class="menu-header">
+      <h1>🚀 SPACE SHOOTER</h1>
+      <p>Defenda a Terra dos invasores!</p>
     </div>
-
-    <h1>SPACE SHOOTER</h1>
-
-    <p>Defenda a Terra dos invasores espaciais!</p>
-
-    <button id="startBtn">
-        ▶ INICIAR JOGO
-    </button>
-
-    <button id="rankingBtn">
-        🏆 RANKING
-    </button>
-
-    <button id="howToPlayBtn">
-        ❓ COMO JOGAR
-    </button>
-
-    <button id="creditsBtn">
-        ℹ CRÉDITOS
-    </button>
-
-</div>
-
-<!-- ================= HUD ================= -->
-
-<div class="hud" id="gameInfo" style="display:none;">
-
-    <div class="box">
-
-        <span>❤️ Vidas</span>
-
-        <strong id="lives">3</strong>
-
-    </div>
-
-    <div class="box">
-
-        <span>⭐ Pontos</span>
-
-        <strong id="score">0</strong>
-
-    </div>
-
-    <div class="box">
-
-        <span>🚩 Fase</span>
-
-        <strong id="wave">1</strong>
-
-    </div>
-
-</div>
-
-<!-- ================= POWERUPS ================= -->
-
-<div id="powerContainer">
-
-    <div id="shieldBox">
-
-        <span>🛡 ESCUDO</span>
-
-        <div class="bar">
-
-            <div id="shieldBar"></div>
-
-        </div>
-
-    </div>
-
-    <div id="doubleBox">
-
-        <span>⚡ TIRO DUPLO</span>
-
-        <div class="bar">
-
-            <div id="doubleBar"></div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ================= BOSS ================= -->
-
-<div id="bossContainer">
-
-    <span>👾 BOSS</span>
-
-    <div class="bossBar">
-
-        <div id="bossLife"></div>
-
-    </div>
-
-</div>
-
-<!-- ================= JOGO ================= -->
-
-<div id="game-container">
-
-    <canvas id="game" width="800" height="500">
-
-        Seu navegador não suporta Canvas.
-
-    </canvas>
-
-</div>
-
-<!-- ================= GAME OVER ================= -->
-
-<div id="gameOver" class="game-over">
-
-    <h1>💥 GAME OVER</h1>
-
-    <h2 id="finalScore"></h2>
-
-    <button id="restartBtn">
-
-        🔄 JOGAR NOVAMENTE
-
-    </button>
-
-</div>
-
-<!-- ================= PAUSE ================= -->
-
-<div id="pauseScreen" class="pause">
-
-    ⏸ PAUSADO
-
-</div>
-
-<!-- ================= RODAPÉ ================= -->
-
-<footer>
-
-    SPACE SHOOTER DELUXE © 2026
-
-</footer>
-
-<script src="script.js"></script>
-
+    
+    <button id="startBtn">▶ INICIAR JOGO</button>
+    <button id="rankingBtn">🏆 RANKING</button>
+    <button id="howToPlayBtn">❔ COMO JOGAR</button>
+    <button id="creditsBtn">ℹ️ CRÉDITOS</button>
+  </div>
+
+  <!-- INFO DURANTE O JOGO -->
+  <div class="info" id="gameInfo" style="display: none;">
+    <div>Fase: <span id="wave">1</span></div>
+    <div>Pontos: <span id="score">0</span></div>
+    <div>Vidas: <span id="lives">3</span></div>
+  </div>
+
+  <div id="game-container">
+    <canvas id="game" width="800" height="500"></canvas>
+  </div>
+
+  <script src="script.js"></script>
 </body>
-
 </html>
