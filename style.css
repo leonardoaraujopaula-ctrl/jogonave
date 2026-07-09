@@ -8,39 +8,38 @@ body {
   font-family: 'Arial Black', Arial, sans-serif;
   background: linear-gradient(#000022, #000011);
   color: white;
-  text-align: center;
   overflow: hidden;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-header {
-  padding: 20px;
-  background: linear-gradient(#220044, #5500aa);
-  font-size: 2.5em;
-  text-shadow: 0 0 25px #aa00ff;
+.container {
+  position: relative;
 }
 
-/* Info do jogo */
-.info {
+/* HUD */
+.hud {
   display: flex;
   justify-content: space-around;
   font-size: 24px;
-  padding: 12px;
+  padding: 12px 0;
   background: rgba(0, 0, 80, 0.95);
   border-bottom: 3px solid #00ffff;
-  flex-wrap: wrap;
+  text-shadow: 0 0 10px #00ffff;
 }
 
-/* Container do jogo */
+/* Canvas Container */
 #game-container {
   position: relative;
   width: 800px;
   height: 500px;
-  margin: 20px auto;
   background: #000011;
   border: 8px solid #00ffff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 40px #00ffff;
+  box-shadow: 0 0 50px #00ffff;
 }
 
 canvas {
@@ -48,40 +47,49 @@ canvas {
   image-rendering: pixelated;
 }
 
-/* MENU */
-.menu {
+/* Telas */
+.screen {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: none;
+  z-index: 100;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* MENU */
+.menu-content {
   background: linear-gradient(145deg, rgba(15, 15, 70, 0.98), rgba(5, 5, 35, 0.98));
-  padding: 45px 75px;
+  padding: 50px 80px;
   border: 7px solid #00ffff;
   border-radius: 25px;
   text-align: center;
-  z-index: 100;
-  box-shadow: 0 0 80px #00ffff, inset 0 0 50px rgba(0, 255, 255, 0.2);
-  min-width: 380px;
+  box-shadow: 0 0 80px #00ffff, inset 0 0 60px rgba(0, 255, 255, 0.15);
+  min-width: 400px;
 }
 
-.menu-header h1 {
-  font-size: 3.1em;
-  margin-bottom: 8px;
+.menu-content h1 {
+  font-size: 3.2em;
+  margin-bottom: 10px;
   background: linear-gradient(#00ffff, #44ddff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 30px #00ffff;
 }
 
-.menu-header p {
+.subtitle {
   font-size: 1.4em;
   color: #aaccff;
-  margin-bottom: 35px;
+  margin-bottom: 40px;
 }
 
-.menu button {
+.menu-buttons button {
   width: 100%;
-  padding: 18px 25px;
+  padding: 18px;
   margin: 12px 0;
   font-size: 23px;
   font-weight: bold;
@@ -91,11 +99,11 @@ canvas {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(255, 0, 120, 0.5);
+  box-shadow: 0 8px 25px rgba(255, 0, 120, 0.5);
 }
 
-.menu button:hover {
+.menu-buttons button:hover {
   transform: scale(1.08) translateY(-4px);
   background: linear-gradient(#ff44aa, #ff0088);
-  box-shadow: 0 0 35px #ff00ff;
+  box-shadow: 0 0 40px #ff00ff;
 }
