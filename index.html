@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 SPACE SHOOTER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- MENU -->
+    <div id="menu" class="screen active">
+      <div class="menu-content">
+        <h1>🚀 SPACE SHOOTER</h1>
+        <p class="subtitle">Defenda a Terra dos invasores!</p>
+        
+        <div class="menu-buttons">
+          <button id="startBtn">▶ INICIAR JOGO</button>
+          <button id="rankingBtn">🏆 RANKING</button>
+          <button id="howToPlayBtn">❔ COMO JOGAR</button>
+          <button id="creditsBtn">ℹ️ CRÉDITOS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA DO JOGO -->
+    <div id="gameScreen" class="screen">
+      <div class="hud" id="gameInfo">
+        <div>Fase: <span id="wave">1</span></div>
+        <div>Pontos: <span id="score">0</span></div>
+        <div>Vidas: <span id="lives">3</span></div>
+      </div>
+      
+      <div id="game-container">
+        <canvas id="game" width="800" height="500"></canvas>
+      </div>
+    </div>
+
+    <!-- TELA DE RANKING -->
+    <div id="rankingScreen" class="screen">
+      <div class="menu-content">
+        <h1>🏆 RANKING</h1>
+        <div id="rankingList" class="ranking-list"></div>
+        <button id="backToMenuBtn">← VOLTAR AO MENU</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
