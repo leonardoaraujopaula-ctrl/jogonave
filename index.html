@@ -9,7 +9,6 @@
 <body>
   <div class="container">
 
-    <!-- MENU -->
     <div id="menu" class="screen active">
       <div class="menu-content">
         <h1>🚀 SPACE SHOOTER</h1>
@@ -24,20 +23,34 @@
       </div>
     </div>
 
-    <!-- TELA DO JOGO -->
     <div id="gameScreen" class="screen">
-      <div class="hud" id="gameInfo">
-        <div>Fase: <span id="wave">1</span></div>
-        <div>Pontos: <span id="score">0</span></div>
-        <div>Vidas: <span id="lives">3</span></div>
-      </div>
-      
       <div id="game-container">
+        <div class="hud" id="gameInfo">
+          <div>Fase: <span id="wave">1</span></div>
+          <div>Pontos: <span id="score">0</span></div>
+          <div>Vidas: <span id="lives">3</span></div>
+        </div>
         <canvas id="game" width="800" height="500"></canvas>
       </div>
     </div>
 
-    <!-- TELA DE RANKING -->
+    <div id="gameOverScreen" class="screen">
+      <div class="menu-content game-over-content">
+        <h1 class="game-over-title">💥 GAME OVER</h1>
+        <p class="subtitle">Sua nave foi destruída!</p>
+        
+        <div class="final-stats">
+          <p>Pontuação: <span id="finalScore">0</span> pts</p>
+          <p>Fase Alcançada: <span id="finalPhase">1</span></p>
+        </div>
+
+        <div class="menu-buttons">
+          <button id="restartBtn">🔄 JOGAR NOVAMENTE</button>
+          <button id="gameOverMenuBtn">🏠 MENU PRINCIPAL</button>
+        </div>
+      </div>
+    </div>
+
     <div id="rankingScreen" class="screen">
       <div class="menu-content">
         <h1>🏆 RANKING</h1>
