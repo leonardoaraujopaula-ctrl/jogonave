@@ -13,13 +13,14 @@ const rankingScreen = document.getElementById('rankingScreen');
 
 const finalScoreEl = document.getElementById('finalScore');
 const finalPhaseEl = document.getElementById('finalPhase');
+const playerNameInput = document.getElementById('playerNameInput');
 
 // --- VARIÁVEIS DE ESTADO ---
 let score = 0, lives = 3, phase = 1;
 let gameRunning = false, paused = false;
 
 let player, bullets = [], enemies = [], particles = [], powerUps = [], stars = [];
-let keys = {}, playerName = "";
+let keys = {}, playerName = "Piloto";
 let doubleShot = false, doubleShotEndTime = 0;
 let highscores = JSON.parse(localStorage.getItem('spaceHighscores')) || [];
 let phaseUpText = null;
@@ -324,6 +325,9 @@ function spawnEnemy() {
 function startGame() {
   if (spawnTimeout) clearTimeout(spawnTimeout);
 
+  // Captura o nome digitado na caixa de texto do menu
+  playerName = playerNameInput.value.trim() || "Piloto";
+
   score = 0; lives = 3; phase = 1; doubleShot = false;
   bullets = []; enemies = []; particles = []; powerUps = [];
 
@@ -358,6 +362,9 @@ function endGame() {
 
 // --- ESCUTADORES DE EVENTOS ---
 window.addEventListener('keydown', e => {
+  // Evita mover a nave enquanto está digitando o nome no input
+  if (document.activeElement === playerNameInput) return;
+
   keys[e.key] = true;
   if ((e.key === ' ' || e.key === 'Spacebar') && gameRunning) {
     shoot();
@@ -366,13 +373,14 @@ window.addEventListener('keydown', e => {
   if ((e.key === 'p' || e.key === 'P') && gameRunning) paused = !paused;
 });
 
-window.addEventListener('keyup', e => keys[e.key] = false);
+window.addEventListener('keyup', e => {
+  if (document.activeElement === playerNameInput) return;
+  keys[e.key] = false;
+});
+
 canvas.addEventListener('click', shoot);
 
-document.getElementById('startBtn').addEventListener('click', () => {
-  playerName = prompt("Digite o nome do Piloto:", "Piloto")?.trim() || "Piloto";
-  startGame();
-});
+document.getElementById('startBtn').addEventListener('click', startGame);
 
 document.getElementById('restartBtn').addEventListener('click', startGame);
 
