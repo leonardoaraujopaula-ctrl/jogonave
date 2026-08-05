@@ -15,11 +15,15 @@ const finalScoreEl = document.getElementById('finalScore');
 const finalPhaseEl = document.getElementById('finalPhase');
 const playerNameInput = document.getElementById('playerNameInput');
 
+const bossHealthContainer = document.getElementById('bossHealthContainer');
+const bossHealthBar = document.getElementById('bossHealthBar');
+
 // --- VARIÁVEIS DE ESTADO ---
 let score = 0, lives = 3, phase = 1;
 let gameRunning = false, paused = false;
 
-let player, bullets = [], enemies = [], particles = [], powerUps = [], stars = [];
+let player, bullets = [], enemyBullets = [], enemies = [], particles = [], powerUps = [], stars = [];
+let activeBoss = null;
 let keys = {}, playerName = "Piloto";
 let doubleShot = false, doubleShotEndTime = 0;
 let highscores = JSON.parse(localStorage.getItem('spaceHighscores')) || [];
@@ -79,15 +83,62 @@ class Bullet {
   }
 }
 
+class EnemyBullet {
+  constructor(x, y, vx = 0, vy = 5) {
+    this.x = x; this.y = y;
+    this.width = 8; this.height = 14;
+    this.vx = vx; this.vy = vy;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+  draw() {
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff0000';
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.shadowBlur = 0;
+  }
+}
+
 class Enemy {
   constructor() {
     this.width = 45; this.height = 35;
     this.x = Math.random() * (canvas.width - this.width);
     this.y = -40;
-    this.speed = 2.0 + phase * 0.4;
-    this.color = phase % 2 === 0 ? '#ff0055' : '#ff5500';
+    this.speed = 2.0 + phase * 0.3;
+    
+    // Tipos de Inimigos
+    const rand = Math.random();
+    if (rand < 0.4) {
+      this.type = 'NORMAL';
+      this.color = '#ff0055';
+    } else if (rand < 0.7) {
+      this.type = 'ZIGZAG';
+      this.color = '#ffff00';
+      this.startX = this.x;
+      this.angle = 0;
+    } else {
+      this.type = 'SHOOTER';
+      this.color = '#0088ff';
+      this.lastShot = Date.now();
+    }
   }
-  update() { this.y += this.speed; }
+  update() {
+    this.y += this.speed;
+
+    if (this.type === 'ZIGZAG') {
+      this.angle += 0.05;
+      this.x = this.startX + Math.sin(this.angle) * 60;
+      this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
+    } else if (this.type === 'SHOOTER') {
+      if (Date.now() - this.lastShot > 1800) {
+        enemyBullets.push(new EnemyBullet(this.x + this.width / 2 - 4, this.y + this.height));
+        this.lastShot = Date.now();
+      }
+    }
+  }
   draw() {
     ctx.shadowBlur = 8;
     ctx.shadowColor = this.color;
@@ -96,6 +147,56 @@ class Enemy {
     
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(this.x + 10, this.y + 8, this.width - 20, 10);
+    ctx.shadowBlur = 0;
+  }
+}
+
+class Boss {
+  constructor() {
+    this.width = 160;
+    this.height = 90;
+    this.x = canvas.width / 2 - this.width / 2;
+    this.y = -100;
+    this.targetY = 70;
+    this.maxHealth = 100 + phase * 40;
+    this.health = this.maxHealth;
+    this.speedX = 3;
+    this.lastShot = Date.now();
+  }
+  update() {
+    // Entrando na tela
+    if (this.y < this.targetY) {
+      this.y += 2;
+      return;
+    }
+
+    // Movimento Lateral
+    this.x += this.speedX;
+    if (this.x <= 0 || this.x + this.width >= canvas.width) {
+      this.speedX *= -1;
+    }
+
+    // Ataque triplo do Boss
+    if (Date.now() - this.lastShot > 1400) {
+      const centerX = this.x + this.width / 2;
+      const bottomY = this.y + this.height;
+      enemyBullets.push(new EnemyBullet(centerX - 30, bottomY, -2, 5));
+      enemyBullets.push(new EnemyBullet(centerX, bottomY, 0, 6));
+      enemyBullets.push(new EnemyBullet(centerX + 30, bottomY, 2, 5));
+      this.lastShot = Date.now();
+    }
+  }
+  draw() {
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#ff0055';
+    ctx.fillStyle = '#aa0033';
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+
+    ctx.fillStyle = '#ff0055';
+    ctx.fillRect(this.x + 20, this.y + 20, this.width - 40, this.height - 40);
+
+    ctx.fillStyle = '#00ffff';
+    ctx.fillRect(this.x + this.width / 2 - 15, this.y + this.height - 20, 30, 15);
     ctx.shadowBlur = 0;
   }
 }
@@ -161,9 +262,9 @@ function drawBackground() {
   }
 }
 
-function createExplosion(x, y) {
-  for (let i = 0; i < 25; i++) {
-    const colors = ['#ffff00', '#ff8800', '#ff0000', '#ffaa00'];
+function createExplosion(x, y, count = 25) {
+  for (let i = 0; i < count; i++) {
+    const colors = ['#ffff00', '#ff8800', '#ff0000', '#ffaa00', '#00ffff'];
     particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
   }
 }
@@ -207,6 +308,16 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
+function updateBossBar() {
+  if (activeBoss) {
+    bossHealthContainer.classList.remove('hidden');
+    const pct = Math.max(0, (activeBoss.health / activeBoss.maxHealth) * 100);
+    bossHealthBar.style.width = `${pct}%`;
+  } else {
+    bossHealthContainer.classList.add('hidden');
+  }
+}
+
 // --- LOOP DO JOGO ---
 function gameLoop() {
   if (!gameRunning || paused) {
@@ -219,7 +330,7 @@ function gameLoop() {
   player.update();
   player.draw();
 
-  // Tiros
+  // Tiros do Jogador
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     b.update();
@@ -227,35 +338,91 @@ function gameLoop() {
     if (b.y < -30) bullets.splice(i, 1);
   }
 
-  // Inimigos
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    const e = enemies[i];
-    e.update();
-    e.draw();
+  // Tiros dos Inimigos
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const eb = enemyBullets[i];
+    eb.update();
+    eb.draw();
 
-    // Colisão com Nave
-    if (checkCollision(e, player)) {
+    if (checkCollision(eb, player)) {
       lives--;
       livesEl.textContent = lives;
       createExplosion(player.x + player.width/2, player.y + player.height/2);
-      enemies.splice(i, 1);
+      enemyBullets.splice(i, 1);
       if (lives <= 0) endGame();
       continue;
     }
 
-    // Colisão com Tiros
+    if (eb.y > canvas.height || eb.x < 0 || eb.x > canvas.width) {
+      enemyBullets.splice(i, 1);
+    }
+  }
+
+  // Processa Boss se Existir
+  if (activeBoss) {
+    activeBoss.update();
+    activeBoss.draw();
+    updateBossBar();
+
+    // Colisão do Jogador com Boss
+    if (checkCollision(activeBoss, player)) {
+      lives--;
+      livesEl.textContent = lives;
+      createExplosion(player.x + player.width/2, player.y + player.height/2);
+      if (lives <= 0) endGame();
+    }
+
+    // Colisão do Tiro no Boss
     for (let j = bullets.length - 1; j >= 0; j--) {
-      if (checkCollision(e, bullets[j])) {
-        score += 20 + phase * 5;
-        scoreEl.textContent = score;
-        createExplosion(e.x + e.width/2, e.y + e.height/2);
-        enemies.splice(i, 1);
+      if (checkCollision(activeBoss, bullets[j])) {
+        activeBoss.health -= 10;
+        createExplosion(bullets[j].x, bullets[j].y, 5);
         bullets.splice(j, 1);
-        if (Math.random() < 0.20) powerUps.push(new PowerUp(e.x + e.width/2 - 12, e.y));
-        break;
+
+        if (activeBoss.health <= 0) {
+          score += 1500;
+          scoreEl.textContent = score;
+          createExplosion(activeBoss.x + activeBoss.width/2, activeBoss.y + activeBoss.height/2, 60);
+          activeBoss = null;
+          updateBossBar();
+          
+          // Avança a fase após derrotar o Boss
+          phase++;
+          waveEl.textContent = phase;
+          showPhaseUp();
+          break;
+        }
       }
     }
-    if (e.y > canvas.height) enemies.splice(i, 1);
+  } else {
+    // Inimigos Normais
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const e = enemies[i];
+      e.update();
+      e.draw();
+
+      if (checkCollision(e, player)) {
+        lives--;
+        livesEl.textContent = lives;
+        createExplosion(player.x + player.width/2, player.y + player.height/2);
+        enemies.splice(i, 1);
+        if (lives <= 0) endGame();
+        continue;
+      }
+
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (checkCollision(e, bullets[j])) {
+          score += 20 + phase * 5;
+          scoreEl.textContent = score;
+          createExplosion(e.x + e.width/2, e.y + e.height/2);
+          enemies.splice(i, 1);
+          bullets.splice(j, 1);
+          if (Math.random() < 0.20) powerUps.push(new PowerUp(e.x + e.width/2 - 12, e.y));
+          break;
+        }
+      }
+      if (e.y > canvas.height) enemies.splice(i, 1);
+    }
   }
 
   // PowerUps
@@ -282,14 +449,14 @@ function gameLoop() {
 
   if (doubleShot && Date.now() > doubleShotEndTime) doubleShot = false;
 
-  // Mudança de Fase
-  if (score >= phase * 350) {
+  // Mudança de Fase (Caso não seja fase de Boss)
+  if (!activeBoss && phase % 3 !== 0 && score >= phase * 350) {
     phase++;
     waveEl.textContent = phase;
     showPhaseUp();
   }
 
-  // Animação de Texto de Fase
+  // Animação do Texto de Fase
   if (phaseUpText) {
     ctx.globalAlpha = phaseUpText.alpha;
     ctx.font = 'bold 50px Arial';
@@ -317,23 +484,36 @@ function shoot() {
 
 function spawnEnemy() {
   if (!gameRunning || paused) return;
-  enemies.push(new Enemy());
-  spawnTimeout = setTimeout(spawnEnemy, Math.max(250, 950 - phase * 65));
+
+  // Se a fase for múltipla de 3 e não houver Boss ativo, gera o Boss
+  if (phase % 3 === 0 && !activeBoss) {
+    enemies = []; // Limpa inimigos normais
+    activeBoss = new Boss();
+  } 
+
+  // Gera inimigos normais se não houver Boss ativo
+  if (!activeBoss) {
+    enemies.push(new Enemy());
+  }
+
+  spawnTimeout = setTimeout(spawnEnemy, Math.max(250, 950 - phase * 60));
 }
 
 // --- GERENCIAMENTO DO JOGO ---
 function startGame() {
   if (spawnTimeout) clearTimeout(spawnTimeout);
 
-  // Captura o nome digitado na caixa de texto do menu
   playerName = playerNameInput.value.trim() || "Piloto";
 
   score = 0; lives = 3; phase = 1; doubleShot = false;
-  bullets = []; enemies = []; particles = []; powerUps = [];
+  bullets = []; enemyBullets = []; enemies = []; particles = []; powerUps = [];
+  activeBoss = null;
 
   scoreEl.textContent = '0';
   waveEl.textContent = '1';
   livesEl.textContent = '3';
+
+  updateBossBar();
 
   gameRunning = true;
   paused = false;
@@ -362,7 +542,6 @@ function endGame() {
 
 // --- ESCUTADORES DE EVENTOS ---
 window.addEventListener('keydown', e => {
-  // Evita mover a nave enquanto está digitando o nome no input
   if (document.activeElement === playerNameInput) return;
 
   keys[e.key] = true;
@@ -398,7 +577,7 @@ document.getElementById('backToMenuBtn').addEventListener('click', () => {
 });
 
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("🎮 COMO JOGAR:\n\n• Movimentação: Setas ou WASD\n• Disparo: Barra de Espaço ou Clique no Mouse\n• Pausa: Tecla P\n\n• Pegue os itens '×2' para ativar o Tiro Duplo!");
+  alert("🎮 COMO JOGAR:\n\n• Movimentação: Setas ou WASD\n• Disparo: Barra de Espaço ou Clique\n• Pausa: Tecla P\n\n• CUIDADO: Inimigos azuis e Chefões atiram de volta!\n• Pegue os itens '×2' para ativar o Tiro Duplo.");
 });
 
 document.getElementById('creditsBtn').addEventListener('click', () => {
