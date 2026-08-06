@@ -24,6 +24,7 @@ let gameRunning = false, paused = false;
 
 let player, bullets = [], enemyBullets = [], enemies = [], particles = [], powerUps = [], stars = [];
 let activeBoss = null;
+let bossSpawnedThisPhase = false; // Garante que o Boss aparece 1x por fase
 let keys = {}, playerName = "Piloto";
 let doubleShot = false, doubleShotEndTime = 0;
 let highscores = JSON.parse(localStorage.getItem('spaceHighscores')) || [];
@@ -109,7 +110,6 @@ class Enemy {
     this.y = -40;
     this.speed = 2.0 + phase * 0.3;
     
-    // Tipos de Inimigos
     const rand = Math.random();
     if (rand < 0.4) {
       this.type = 'NORMAL';
@@ -158,25 +158,22 @@ class Boss {
     this.x = canvas.width / 2 - this.width / 2;
     this.y = -100;
     this.targetY = 70;
-    this.maxHealth = 100 + phase * 40;
+    this.maxHealth = 80 + phase * 30;
     this.health = this.maxHealth;
     this.speedX = 3;
     this.lastShot = Date.now();
   }
   update() {
-    // Entrando na tela
     if (this.y < this.targetY) {
       this.y += 2;
       return;
     }
 
-    // Movimento Lateral
     this.x += this.speedX;
     if (this.x <= 0 || this.x + this.width >= canvas.width) {
       this.speedX *= -1;
     }
 
-    // Ataque triplo do Boss
     if (Date.now() - this.lastShot > 1400) {
       const centerX = this.x + this.width / 2;
       const bottomY = this.y + this.height;
@@ -202,18 +199,31 @@ class Boss {
 }
 
 class PowerUp {
-  constructor(x, y) {
+  constructor(x, y, type = 'DOUBLE_SHOT') {
     this.x = x; this.y = y;
-    this.width = 25; this.height = 25;
+    this.width = 28; this.height = 28;
     this.speed = 2.5;
+    this.type = type; // 'DOUBLE_SHOT' ou 'EXTRA_LIFE'
   }
   update() { this.y += this.speed; }
   draw() {
-    ctx.fillStyle = '#00ff00';
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 14px Arial';
-    ctx.fillText('×2', this.x + 4, this.y + 18);
+    ctx.shadowBlur = 10;
+    if (this.type === 'DOUBLE_SHOT') {
+      ctx.shadowColor = '#00ff00';
+      ctx.fillStyle = '#00ff00';
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText('×2', this.x + 5, this.y + 20);
+    } else if (this.type === 'EXTRA_LIFE') {
+      ctx.shadowColor = '#ff0055';
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px Arial';
+      ctx.fillText('❤️', this.x + 4, this.y + 21);
+    }
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -358,13 +368,12 @@ function gameLoop() {
     }
   }
 
-  // Processa Boss se Existir
+  // Boss
   if (activeBoss) {
     activeBoss.update();
     activeBoss.draw();
     updateBossBar();
 
-    // Colisão do Jogador com Boss
     if (checkCollision(activeBoss, player)) {
       lives--;
       livesEl.textContent = lives;
@@ -372,7 +381,6 @@ function gameLoop() {
       if (lives <= 0) endGame();
     }
 
-    // Colisão do Tiro no Boss
     for (let j = bullets.length - 1; j >= 0; j--) {
       if (checkCollision(activeBoss, bullets[j])) {
         activeBoss.health -= 10;
@@ -380,49 +388,64 @@ function gameLoop() {
         bullets.splice(j, 1);
 
         if (activeBoss.health <= 0) {
-          score += 1500;
+          score += 1000;
           scoreEl.textContent = score;
           createExplosion(activeBoss.x + activeBoss.width/2, activeBoss.y + activeBoss.height/2, 60);
+          
+          // Droppa VIDA EXTRA garantida ao derrotar o Boss!
+          powerUps.push(new PowerUp(activeBoss.x + activeBoss.width/2 - 14, activeBoss.y + activeBoss.height/2, 'EXTRA_LIFE'));
+
           activeBoss = null;
           updateBossBar();
           
-          // Avança a fase após derrotar o Boss
+          // Avança de Fase após o Boss
           phase++;
+          bossSpawnedThisPhase = false;
           waveEl.textContent = phase;
           showPhaseUp();
           break;
         }
       }
     }
-  } else {
-    // Inimigos Normais
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const e = enemies[i];
-      e.update();
-      e.draw();
+  }
 
-      if (checkCollision(e, player)) {
-        lives--;
-        livesEl.textContent = lives;
-        createExplosion(player.x + player.width/2, player.y + player.height/2);
-        enemies.splice(i, 1);
-        if (lives <= 0) endGame();
-        continue;
-      }
+  // Inimigos Normais
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    e.update();
+    e.draw();
 
-      for (let j = bullets.length - 1; j >= 0; j--) {
-        if (checkCollision(e, bullets[j])) {
-          score += 20 + phase * 5;
-          scoreEl.textContent = score;
-          createExplosion(e.x + e.width/2, e.y + e.height/2);
-          enemies.splice(i, 1);
-          bullets.splice(j, 1);
-          if (Math.random() < 0.20) powerUps.push(new PowerUp(e.x + e.width/2 - 12, e.y));
-          break;
-        }
-      }
-      if (e.y > canvas.height) enemies.splice(i, 1);
+    if (checkCollision(e, player)) {
+      lives--;
+      livesEl.textContent = lives;
+      createExplosion(player.x + player.width/2, player.y + player.height/2);
+      enemies.splice(i, 1);
+      if (lives <= 0) endGame();
+      continue;
     }
+
+    for (let j = bullets.length - 1; j >= 0; j--) {
+      if (checkCollision(e, bullets[j])) {
+        score += 20 + phase * 5;
+        scoreEl.textContent = score;
+        createExplosion(e.x + e.width/2, e.y + e.height/2);
+
+        // SORTEIO DE POWER-UPS
+        const rand = Math.random();
+        if (rand < 0.15) {
+          // 15% de chance: Tiro Duplo
+          powerUps.push(new PowerUp(e.x + e.width/2 - 14, e.y, 'DOUBLE_SHOT'));
+        } else if (rand < 0.18) {
+          // 3% de chance: Vida Extra (Raro!)
+          powerUps.push(new PowerUp(e.x + e.width/2 - 14, e.y, 'EXTRA_LIFE'));
+        }
+
+        enemies.splice(i, 1);
+        bullets.splice(j, 1);
+        break;
+      }
+    }
+    if (e.y > canvas.height) enemies.splice(i, 1);
   }
 
   // PowerUps
@@ -430,9 +453,16 @@ function gameLoop() {
     const p = powerUps[i];
     p.update();
     p.draw();
+
     if (checkCollision(p, player)) {
-      doubleShot = true;
-      doubleShotEndTime = Date.now() + 8000;
+      if (p.type === 'DOUBLE_SHOT') {
+        doubleShot = true;
+        doubleShotEndTime = Date.now() + 8000;
+      } else if (p.type === 'EXTRA_LIFE') {
+        lives++;
+        livesEl.textContent = lives;
+        createExplosion(player.x + player.width/2, player.y + player.height/2, 15);
+      }
       powerUps.splice(i, 1);
     } else if (p.y > canvas.height) {
       powerUps.splice(i, 1);
@@ -449,14 +479,15 @@ function gameLoop() {
 
   if (doubleShot && Date.now() > doubleShotEndTime) doubleShot = false;
 
-  // Mudança de Fase (Caso não seja fase de Boss)
-  if (!activeBoss && phase % 3 !== 0 && score >= phase * 350) {
+  // Mudança de Fase Normal (para fases que não são de Boss)
+  if (!activeBoss && phase % 3 !== 0 && score >= phase * 400) {
     phase++;
+    bossSpawnedThisPhase = false;
     waveEl.textContent = phase;
     showPhaseUp();
   }
 
-  // Animação do Texto de Fase
+  // Animação de Texto da Fase
   if (phaseUpText) {
     ctx.globalAlpha = phaseUpText.alpha;
     ctx.font = 'bold 50px Arial';
@@ -485,18 +516,16 @@ function shoot() {
 function spawnEnemy() {
   if (!gameRunning || paused) return;
 
-  // Se a fase for múltipla de 3 e não houver Boss ativo, gera o Boss
-  if (phase % 3 === 0 && !activeBoss) {
-    enemies = []; // Limpa inimigos normais
+  // Se for fase múltipla de 3 (ex: 3, 6, 9) e o Boss ainda não apareceu nesta fase
+  if (phase % 3 === 0 && !activeBoss && !bossSpawnedThisPhase) {
     activeBoss = new Boss();
+    bossSpawnedThisPhase = true;
   } 
 
-  // Gera inimigos normais se não houver Boss ativo
-  if (!activeBoss) {
-    enemies.push(new Enemy());
-  }
+  // Inimigos normais continuam surgindo
+  enemies.push(new Enemy());
 
-  spawnTimeout = setTimeout(spawnEnemy, Math.max(250, 950 - phase * 60));
+  spawnTimeout = setTimeout(spawnEnemy, Math.max(300, 1000 - phase * 60));
 }
 
 // --- GERENCIAMENTO DO JOGO ---
@@ -508,6 +537,7 @@ function startGame() {
   score = 0; lives = 3; phase = 1; doubleShot = false;
   bullets = []; enemyBullets = []; enemies = []; particles = []; powerUps = [];
   activeBoss = null;
+  bossSpawnedThisPhase = false;
 
   scoreEl.textContent = '0';
   waveEl.textContent = '1';
@@ -577,7 +607,7 @@ document.getElementById('backToMenuBtn').addEventListener('click', () => {
 });
 
 document.getElementById('howToPlayBtn').addEventListener('click', () => {
-  alert("🎮 COMO JOGAR:\n\n• Movimentação: Setas ou WASD\n• Disparo: Barra de Espaço ou Clique\n• Pausa: Tecla P\n\n• CUIDADO: Inimigos azuis e Chefões atiram de volta!\n• Pegue os itens '×2' para ativar o Tiro Duplo.");
+  alert("🎮 COMO JOGAR:\n\n• Movimentação: Setas ou WASD\n• Disparo: Barra de Espaço ou Clique\n• Pausa: Tecla P\n\n• ITENS:\n  - '×2': Ativa o Tiro Duplo\n  - '❤️': Restaura +1 Vida (Raro)");
 });
 
 document.getElementById('creditsBtn').addEventListener('click', () => {
